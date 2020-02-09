@@ -1,5 +1,7 @@
 package com.cross.domain
 
+import java.util.*
+
 sealed class ResultEntity<out L, out R> {
     class Failure(val notifications: List<Notification>) : ResultEntity<List<Notification>, Nothing>()
     class Success<T : Entity>(val success: T) : ResultEntity<Nothing, T>()
@@ -7,13 +9,16 @@ sealed class ResultEntity<out L, out R> {
 
 open abstract class Entity {
 
-    abstract fun validate() : List<ValidationResult<Notification, Any>>
+    protected abstract fun validate() : List<Optional<Notification>>
 
-    val notifications : List<Notification>
-        get() = ValidationResult.validate(validate())
+    protected val notifications : List<Notification>
+        get() = validate()
+                .filter { it.isPresent }
+                .map { it.get() }
 
-    fun hasNotification() : Boolean {
-        return ValidationResult.hasNotification(validate())
-    }
+    protected fun hasNotification() : Boolean =
+            validate()
+            .filter { it.isPresent }
+            .isNotEmpty()
 
 }

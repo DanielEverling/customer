@@ -13,8 +13,8 @@ class CustomerControllerIT {
     private val resource = "http://api:8080/api/customer"
 
     @Test
-    fun shouldCreateCustomer() {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "Renato Portallupi", nickName = "renato")
+    fun `should create customer` () {
+        val createCustomerCommand = CreateCustomerCommand(completeName = "Renato Portallupi", nickName = "renato", email = "renato@gremio.net")
 
         val response = RestTemplate().postForEntity(resource, createCustomerCommand, CreateCustomerCommand::class.java)
 
@@ -27,8 +27,8 @@ class CustomerControllerIT {
     }
 
     @Test
-    fun shouldValidateCreationCustomerWithEmptyCompleteNameAndEmptyNickName() {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "", nickName = "")
+    fun `should validate customer creation with full name and empty name`() {
+        val createCustomerCommand = CreateCustomerCommand(completeName = "", nickName = "", email = "")
 
         try {
             RestTemplate().postForEntity(resource, createCustomerCommand, String::class.java)
@@ -37,12 +37,13 @@ class CustomerControllerIT {
             val body = e.responseBodyAsString
             assertThat(body, StringContains.containsString("Complete Name is required."))
             assertThat(body, StringContains.containsString("Nick Name is required."))
+            assertThat(body, StringContains.containsString("Email is required."))
         }
     }
 
     @Test
-    fun shouldValidateCreationCustomerWithCompleteNameSizeIsGreaterThanMaxLengthAndNickNameSizeIsGreaterThanMaxLength() {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi.")
+    fun `should validate the creation of the customer with the full name of the nick name greater than the maximum size`() {
+        val createCustomerCommand = CreateCustomerCommand(completeName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi.", email = "silvio@sbt.com")
 
         try {
             RestTemplate().postForEntity(resource, createCustomerCommand, String::class.java)

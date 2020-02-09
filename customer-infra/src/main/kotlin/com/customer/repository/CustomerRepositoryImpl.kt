@@ -15,7 +15,7 @@ class CustomerRepositoryImpl : CustomerRepository {
 
     override fun insert(customer: Customer) {
         CustomerTable.insert {
-            it[completeName] = customer.completeName
+            it[completeName] = customer.fullName
             it[nickName] = customer.nickName
             it[status] = customer.status.ordinal
         }

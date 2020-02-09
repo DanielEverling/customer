@@ -18,15 +18,16 @@ class CustomerTest {
     }
 
     @Test
-    fun shouldCreateCustomer() {
-        val resultCustomer = Customer.create(completeName = "Ranato Portaluppi", nickName = "renato", customerSpecification = customerSpecification)
+    fun `should create customer`() {
+        val resultCustomer = Customer.create(fullName = "Ranato Portaluppi", nickName = "renato", email = Email("renato@imortal.com"), customerSpecification = customerSpecification)
 
        when(resultCustomer) {
            is ResultEntity.Success ->
                apply {
                    val customer = resultCustomer.success
-                   assertEquals("Ranato Portaluppi", customer.completeName)
+                   assertEquals("Ranato Portaluppi", customer.fullName)
                    assertEquals("renato", customer.nickName)
+                   assertEquals( Email("renato@imortal.com"), customer.email)
                    assertEquals(CustomerStatus.ACTIVE, customer.status)
 
                }
@@ -35,13 +36,13 @@ class CustomerTest {
     }
 
     @Test
-    fun shouldValidateCreationCustomerWithEmptyCompleteNameAndEmptyNickName() {
+    fun  `should validate customer creation with full name and empty name`() {
 
         val numbers = mutableListOf("one", "two", "three", "four", "five")
         val resultList = numbers.map { it.length }.filter { it > 3 }
         println(resultList)
 
-        val resultCustomer = Customer.create(completeName = "", nickName = "", customerSpecification = customerSpecification)
+        val resultCustomer = Customer.create(fullName = "", nickName = "", email = Email(""), customerSpecification = customerSpecification)
 
         when(resultCustomer) {
             is ResultEntity.Failure ->
@@ -52,13 +53,14 @@ class CustomerTest {
                     assertEquals("Complete Name is required.", notifications[0].notification)
                     assertEquals("Nick Name", notifications[1].field)
                     assertEquals("Nick Name is required.", notifications[1].notification)
+                    assertEquals("Email is required.", notifications[2].notification)
                 }
         }
     }
 
     @Test
-    fun shouldValidateCreationCustomerWithCompleteNameSizeIsGreaterThanMaxLengthAndNickNameSizeIsGreaterThanMaxLength() {
-        val resultCustomer = Customer.create(completeName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi", customerSpecification = customerSpecification)
+    fun `should validate the creation of the customer with the full name of the nick name greater than the maximum size`() {
+        val resultCustomer = Customer.create(fullName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi", email = Email("silvio@sbt.com"), customerSpecification = customerSpecification)
 
         when(resultCustomer) {
             is ResultEntity.Failure ->
@@ -72,9 +74,9 @@ class CustomerTest {
     }
 
     @Test
-    fun shouldValidateCreationCustomerWhenAlreadyExists() {
+    fun `should validate creation customer when already exists`() {
         `when`(customerRepository.countByCompleteNameAndNickNameAndDifferentId(anyString(), anyString(), anyLong())).thenReturn(1)
-        val resultCustomer = Customer.create(completeName = "Ranato Portaluppi", nickName = "renato", customerSpecification = customerSpecification)
+        val resultCustomer = Customer.create(fullName = "Ranato Portaluppi", nickName = "renato", email = Email("renato@imortal.com"), customerSpecification = customerSpecification)
 
         when(resultCustomer) {
             is ResultEntity.Failure ->

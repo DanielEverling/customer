@@ -1,19 +1,18 @@
 package com.cross.extensions
 
 import com.cross.domain.Notification
-import com.cross.domain.ValidationResult
+import java.util.*
 
-fun String.validateSizeSmallerThan(length: Int, message: String, field : String? = null) : ValidationResult<Notification, String> {
+fun String.validateSizeSmallerThan(length: Int, message: String, field : String? = null) : Optional<Notification> {
     return when {
-        this.length > length -> ValidationResult.Failure(Notification(notification = message, field = field))
-        else -> ValidationResult.Success(this)
+        this.length > length -> Optional.of(Notification(notification = message, field = field))
+        else -> Optional.empty()
     }
-
 }
 
-fun String.isNullOrBlank(message: String, field : String? = null) : ValidationResult<Notification, String> {
+fun String.isNullOrBlank(message: String, field : String? = null) : Optional<Notification> {
    return when {
-        this.isNullOrBlank() -> ValidationResult.Failure(Notification(notification = message, field = field))
-       else -> ValidationResult.Success(this)
+       this.isNullOrBlank() -> Optional.of(Notification(notification = message, field = field))
+       else -> Optional.empty()
     }
 }

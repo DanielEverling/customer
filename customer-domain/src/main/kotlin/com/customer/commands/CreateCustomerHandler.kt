@@ -6,6 +6,7 @@ import com.customer.domain.Customer
 import com.customer.domain.CustomerRepository
 import com.cross.events.DomainInvalidEvent
 import com.customer.domain.CustomerSpecification
+import com.customer.domain.Email
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -20,8 +21,9 @@ class CreateCustomerHandler(val customerSpecification: CustomerSpecification, va
               .toField("nick name", customerCommand.nickName)
               .withInfoMessage("Received command with parameters")
 
-        val resultCustomer = Customer.create(completeName = customerCommand.completeName,
+        val resultCustomer = Customer.create(fullName = customerCommand.completeName,
                 nickName = customerCommand.nickName,
+                email = Email(email = customerCommand.email),
                 customerSpecification = customerSpecification)
 
         when(resultCustomer) {
