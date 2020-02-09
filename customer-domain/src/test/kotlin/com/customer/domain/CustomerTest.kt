@@ -19,9 +19,14 @@ class CustomerTest {
 
     @Test
     fun `should create customer`() {
-        val resultCustomer = Customer.create(fullName = "Ranato Portaluppi", nickName = "renato", email = Email("renato@imortal.com"), customerSpecification = customerSpecification)
 
-       when(resultCustomer) {
+        val resultCustomer = Customer.build(customerSpecification) {
+            email = Email("renato@imortal.com")
+            fullName = "Ranato Portaluppi"
+            nickName = "renato"
+        }
+
+        when(resultCustomer) {
            is ResultEntity.Success ->
                apply {
                    val customer = resultCustomer.success
@@ -42,7 +47,11 @@ class CustomerTest {
         val resultList = numbers.map { it.length }.filter { it > 3 }
         println(resultList)
 
-        val resultCustomer = Customer.create(fullName = "", nickName = "", email = Email(""), customerSpecification = customerSpecification)
+        val resultCustomer = Customer.build(customerSpecification) {
+            email = Email("")
+            fullName = ""
+            nickName = ""
+        }
 
         when(resultCustomer) {
             is ResultEntity.Failure ->
@@ -60,7 +69,11 @@ class CustomerTest {
 
     @Test
     fun `should validate the creation of the customer with the full name of the nick name greater than the maximum size`() {
-        val resultCustomer = Customer.create(fullName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi", email = Email("silvio@sbt.com"), customerSpecification = customerSpecification)
+        val resultCustomer = Customer.build(customerSpecification) {
+            email = Email("silvio@sbt.com")
+            fullName = "Silvio Santos Ipsum ma oi."
+            nickName = "silviosantosipsummaoi"
+        }
 
         when(resultCustomer) {
             is ResultEntity.Failure ->
@@ -76,7 +89,12 @@ class CustomerTest {
     @Test
     fun `should validate creation customer when already exists`() {
         `when`(customerRepository.countByCompleteNameAndNickNameAndDifferentId(anyString(), anyString(), anyLong())).thenReturn(1)
-        val resultCustomer = Customer.create(fullName = "Ranato Portaluppi", nickName = "renato", email = Email("renato@imortal.com"), customerSpecification = customerSpecification)
+
+        val resultCustomer = Customer.build(customerSpecification) {
+            email = Email("renato@imortal.com")
+            fullName = "Ranato Portaluppi"
+            nickName = "renato"
+        }
 
         when(resultCustomer) {
             is ResultEntity.Failure ->

@@ -17,14 +17,16 @@ class CreateCustomerHandler(val customerSpecification: CustomerSpecification, va
 
     fun handle(customerCommand: CreateCustomerCommand) {
 
-        logger.toField("complete name", customerCommand.completeName)
+        logger.toField("complete name", customerCommand.fullName)
               .toField("nick name", customerCommand.nickName)
               .withInfoMessage("Received command with parameters")
 
-        val resultCustomer = Customer.create(fullName = customerCommand.completeName,
-                nickName = customerCommand.nickName,
-                email = Email(email = customerCommand.email),
-                customerSpecification = customerSpecification)
+
+        val resultCustomer = Customer.build(customerSpecification) {
+            email = Email(email = customerCommand.email)
+            fullName = customerCommand.fullName
+            nickName = customerCommand.nickName
+        }
 
         when(resultCustomer) {
             is Failure -> eventPublisher.publisher(DomainInvalidEvent(resultCustomer.notifications))

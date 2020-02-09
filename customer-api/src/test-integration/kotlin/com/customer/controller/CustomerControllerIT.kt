@@ -14,13 +14,13 @@ class CustomerControllerIT {
 
     @Test
     fun `should create customer` () {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "Renato Portallupi", nickName = "renato", email = "renato@gremio.net")
+        val createCustomerCommand = CreateCustomerCommand(fullName = "Renato Portallupi", nickName = "renato", email = "renato@gremio.net")
 
         val response = RestTemplate().postForEntity(resource, createCustomerCommand, CreateCustomerCommand::class.java)
 
         val createCustomerCommandReceived = response.body
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals("Renato Portallupi", createCustomerCommandReceived?.completeName)
+        assertEquals("Renato Portallupi", createCustomerCommandReceived?.fullName)
         assertEquals("renato", createCustomerCommandReceived?.nickName)
         assertNotNull(createCustomerCommandReceived?.createdAt)
         assertNotNull(createCustomerCommandReceived?.id)
@@ -28,7 +28,7 @@ class CustomerControllerIT {
 
     @Test
     fun `should validate customer creation with full name and empty name`() {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "", nickName = "", email = "")
+        val createCustomerCommand = CreateCustomerCommand(fullName = "", nickName = "", email = "")
 
         try {
             RestTemplate().postForEntity(resource, createCustomerCommand, String::class.java)
@@ -43,7 +43,7 @@ class CustomerControllerIT {
 
     @Test
     fun `should validate the creation of the customer with the full name of the nick name greater than the maximum size`() {
-        val createCustomerCommand = CreateCustomerCommand(completeName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi.", email = "silvio@sbt.com")
+        val createCustomerCommand = CreateCustomerCommand(fullName = "Silvio Santos Ipsum ma oi.", nickName = "silviosantosipsummaoi.", email = "silvio@sbt.com")
 
         try {
             RestTemplate().postForEntity(resource, createCustomerCommand, String::class.java)

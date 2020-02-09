@@ -19,26 +19,15 @@ data class Customer private constructor(
 
     private val _status: CustomerStatus = CustomerStatus.ACTIVE
 
+    val status
+        get() = _status
+
     init {
         validate()
     }
 
     companion object {
-        fun create(
-                id : Long? = null,
-                fullName : String,
-                nickName : String,
-                email: Email,
-                customerSpecification : CustomerSpecification
-        ) : ResultEntity<List<Notification>, Customer> {
-
-            val newCustomer = Customer(id, fullName, nickName, email, customerSpecification)
-
-            return  when(newCustomer.hasNotification()) {
-                true -> Failure(newCustomer.notifications)
-                else -> Success<Customer>(newCustomer)
-            }
-        }
+        inline fun build(customerSpecification : CustomerSpecification, block: Builder.() -> Unit) = Builder(customerSpecification).apply(block).build()
     }
 
     override fun validate(): List<Optional<Notification>> = listOf(
@@ -51,6 +40,19 @@ data class Customer private constructor(
             email.validate()
     )
 
-    val status get() = _status
+    class Builder (private val customerSpecification : CustomerSpecification) {
+        var id : Long? = null
+        var fullName : String = ""
+        var nickName : String = ""
+        var email: Email = Email("")
 
+        fun build() : ResultEntity<List<Notification>, Customer> {
+            val newCustomer = Customer(id, fullName, nickName, email, customerSpecification)
+
+            return  when(newCustomer.hasNotification()) {
+                true -> Failure(newCustomer.notifications)
+                else -> Success<Customer>(newCustomer)
+            }
+        }
+    }
 }
