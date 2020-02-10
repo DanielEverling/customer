@@ -1,19 +1,15 @@
 package com.customer.domain
 
 import com.cross.domain.Notification
-import com.cross.domain.ValueObject
+import com.cross.domain.ValidatorsAware
 import com.cross.extensions.isNullOrBlank
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-data class Email (val email: String) : ValueObject() {
+data class Email (val email: String) : ValidatorsAware {
 
-    init {
-        validate()
-    }
-
-    override fun validate(): List<Optional<Notification>> = listOf(
+    override fun validators(): List<Optional<Notification>> = listOf(
             email.isNullOrBlank("Email is required."),
             emailIsValid()
     )

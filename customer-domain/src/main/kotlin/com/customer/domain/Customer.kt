@@ -30,15 +30,14 @@ data class Customer private constructor(
         inline fun build(customerSpecification : CustomerSpecification, block: Builder.() -> Unit) = Builder(customerSpecification).apply(block).build()
     }
 
-    override fun validate(): List<Optional<Notification>> = listOf(
-            fullName.validateSizeSmallerThan(20, "Complete Name must be less than 20 characters.", "Complete Name"),
-            fullName.isNullOrBlank(message = "Complete Name is required.", field = "Complete Name"),
-            nickName.isNullOrBlank("Nick Name is required.", "Nick Name"),
-            nickName.validateSizeSmallerThan(7, "Nick Name must be less than 7 characters.", "Nick Name"),
-            customerSpecification.isSatisfiedBy(this)
-    ).plus(
-            email.validate()
-    )
+    override fun validators(): List<Optional<Notification>> = listOf(
+        fullName.validateSizeSmallerThan(20, "Complete Name must be less than 20 characters.", "Complete Name"),
+        fullName.isNullOrBlank(message = "Complete Name is required.", field = "Complete Name"),
+        nickName.isNullOrBlank("Nick Name is required.", "Nick Name"),
+        nickName.validateSizeSmallerThan(7, "Nick Name must be less than 7 characters.", "Nick Name"),
+        customerSpecification.isSatisfiedBy(this)
+    ) + email.validators()
+
 
     class Builder (private val customerSpecification : CustomerSpecification) {
         var id : Long? = null
@@ -49,10 +48,11 @@ data class Customer private constructor(
         fun build() : ResultEntity<List<Notification>, Customer> {
             val newCustomer = Customer(id, fullName, nickName, email, customerSpecification)
 
-            return  when(newCustomer.hasNotification()) {
-                true -> Failure(newCustomer.notifications)
+            return  when(newCustomer.hasError()) {
+                true -> Failure(newCustomer.validate())
                 else -> Success<Customer>(newCustomer)
             }
         }
     }
+
 }

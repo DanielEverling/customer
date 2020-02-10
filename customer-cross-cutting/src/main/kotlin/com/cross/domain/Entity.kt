@@ -7,18 +7,14 @@ sealed class ResultEntity<out L, out R> {
     class Success<T : Entity>(val success: T) : ResultEntity<Nothing, T>()
 }
 
-open abstract class Entity {
+open abstract class Entity : ValidatorsAware {
 
-    protected abstract fun validate() : List<Optional<Notification>>
-
-    protected val notifications : List<Notification>
-        get() = validate()
+    protected fun validate(): List<Notification> {
+        return validators()
                 .filter { it.isPresent }
                 .map { it.get() }
+    }
 
-    protected fun hasNotification() : Boolean =
-            validate()
-            .filter { it.isPresent }
-            .isNotEmpty()
+    protected fun hasError(): Boolean = validate().isNotEmpty()
 
 }
